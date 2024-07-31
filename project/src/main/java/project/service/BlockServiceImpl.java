@@ -3,25 +3,29 @@ package project.service;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import project.dto.ErrorDto;
 import project.dto.projection.BlockDetailProjection;
 import project.dto.projection.BlockPageDto;
 import project.entity.BlockEntity;
 import project.entity.BlockFileEntity;
+import project.entity.NoteEntity;
 import project.repository.BlockRepository;
+import project.repository.CustomNoteRepository;
 
 @Slf4j
 @Service
 public class BlockServiceImpl implements BlockService {
 	@Autowired
 	BlockRepository blockRepository;
-	
+	@Autowired
+	CustomNoteRepository cNoteRepository;	
+
 	@Override
 	public BlockFileEntity selectBlockFileInfo(int idx, int blockId) throws NoSuchElementException{
 		Optional<BlockFileEntity> optional = blockRepository.findBlockFile(idx ,blockId);
@@ -38,7 +42,8 @@ public class BlockServiceImpl implements BlockService {
 	
 	@Override 
 	public BlockDetailProjection selectBlock(int blockId) throws NoSuchElementException{
-		Optional<BlockDetailProjection> optional = blockRepository.findByBlockId(blockId);
+		Integer genericId = blockId;
+		Optional<BlockDetailProjection> optional = blockRepository.findByBlockId(genericId, BlockDetailProjection.class);
 	
 		if (optional.isPresent()) {
 			BlockDetailProjection qs = optional.get();
@@ -62,16 +67,39 @@ public class BlockServiceImpl implements BlockService {
 	}
 	
 	@Override
-	public void insertRefBlock(int blockId, int noteIdx) {
+	public void insertRefBlock(int WBlockId, int WNoteIdx, int hasRefCnt, BlockDetailProjection ref) {
 		
-		return ;
+		
+		String tempKey = Integer.toString(WBlockId);
+		String tempCnt = Integer.toString(hasRefCnt);
+		String generatedKey = tempKey + tempCnt;
+		
+		NoteEntity temp = cNoteRepository.findNoteWithGraph(0,"note-with-blocks-and-blockFiles");
+		BlockEntity res = new ModelMapper().map(ref, BlockEntity.class);
+		res.setBlockId(Integer.parseInt(generatedKey));
+		res.setNote(temp);
+		
+		// if not..
+		blockRepository.updateBlockRefCnt(WBlockId, hasRefCnt + 1);
+		
+		blockRepository.save(res);
+		
+		
 	}
 	
-	@Override 
-	public BlockEntity SelectOverrideBlock(int blockId) {
+	@Override
+	public BlockDetailProjection selectBlockToModify(int blockId) throws NoSuchElementException{
+		Integer genericId = blockId;
+		Optional<BlockDetailProjection> optional = blockRepository.findByBlockId(genericId, BlockDetailProjection.class);
 		
-		BlockEntity qs = new BlockEntity();
-		return qs;
+		
+		if (optional.isPresent()) {
+			BlockDetailProjection qs = optional.get();
+			return qs;
+		} else {
+			throw new NoSuchElementException("일치하는 데이터가 없음");
+		}
 	}
+	
+	
 }
-	

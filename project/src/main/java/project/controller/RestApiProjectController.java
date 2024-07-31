@@ -194,9 +194,9 @@ public class RestApiProjectController {
 	public ResponseEntity<Object> insertRefBlock(@RequestBody InsertRefBlockRequest req) throws Exception{
 		
 		Map<String, String> result = new HashMap<>();
-		BlockDetailProjection target = blockService.selectBlock(req.getRefBlockId());
-		
-		if(target == null) {
+		BlockDetailProjection ref = blockService.selectBlock(req.getRefBlockId());
+		// no realfile, just StoredurlMapper
+		if(ref == null) {
 			result.put("code", HttpStatus.NOT_FOUND.toString());
 			result.put("message" , "Fetch Failed");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
@@ -205,11 +205,17 @@ public class RestApiProjectController {
 			
 			//selectBlockEntity 일단 그냥 가져와서 해보고 안되면 entity.. 
 			// block 가지고 바로 insertRef.. geneJoinkey해서 
+			
+			blockService.insertRefBlock(req.getWiredBlockId(),req.getWiredNoteIdx(), req.getHasRefCnt(), ref);
+			
+			result.put("code", HttpStatus.OK.toString());
+			result.put("message" , "ok");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
 			
 			
 		}
 	}
 	
+
 	
 }

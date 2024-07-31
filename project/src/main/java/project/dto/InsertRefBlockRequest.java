@@ -11,4 +11,7 @@ public class InsertRefBlockRequest {
 	//graphContext Mapping
 	private int wiredBlockId;
 	private int wiredNoteIdx;
+	
+	//front get .. 
+	private int hasRefCnt;
 }
