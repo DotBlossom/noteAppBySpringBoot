@@ -10,11 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
 import project.common.FileUtils;
+import project.dto.NoteJoinUserDto;
 import project.entity.BlockEntity;
 import project.entity.BlockFileEntity;
 import project.entity.NoteEntity;
 import project.entity.NoteIndexEntity;
 import project.repository.CustomNoteRepository;
+import project.repository.NoteRepository;
 import project.repository.UserRepository;
 
 @Slf4j
@@ -30,6 +32,8 @@ public class NoteServiceImpl implements NoteService {
 	@Autowired
 	private FileUtils fileUtils;
 	
+	@Autowired
+	private NoteRepository noteRepository;
 
 
 	
@@ -37,6 +41,11 @@ public class NoteServiceImpl implements NoteService {
 	public List<NoteEntity> selectNoteList() {
 		return customNoteRepository.findAllByOrderByNoteIdxDesc();
 
+	}
+	
+	@Override
+	public List<NoteJoinUserDto> selectNoteInfoProjectionByUserId(String username) {
+		return noteRepository.findNoteInfoProjectionByUserId(username);
 	}
 	
 	

@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import project.dto.InsertRefBlockRequest;
+import project.dto.NoteJoinUserDto;
 import project.dto.NoteListResponse;
 import project.dto.NotePropsPartialInsertRequest;
 import project.dto.ResponseContainer.DetailBlocksResponse;
@@ -216,6 +217,12 @@ public class RestApiProjectController {
 		}
 	}
 	
-
+	@GetMapping("test/{username}")
+	public List<NoteJoinUserDto> getNoteByUsername(@RequestParam("username") String username) {
+		return noteService.selectNoteInfoProjectionByUserId(username);
+		
+	}
+	
+	
 	
 }

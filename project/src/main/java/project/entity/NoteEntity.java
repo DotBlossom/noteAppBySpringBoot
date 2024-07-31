@@ -58,8 +58,8 @@ public class NoteEntity {
 	private int noteIdx;
 	
 	@Column(nullable = false)
-	private String title;
-	private String contents;
+	private String noteTitle;
+	private String noteContents;
 	
 	
 	@Column(nullable = false)
