@@ -117,12 +117,12 @@ public class BlockServiceImpl implements BlockService {
 	}
 
 	@Override
-	public void deleteFile(String imageUrl) throws IOException {
+	public boolean deleteFile(String imageUrl) throws IOException {
 
 		// / 까지 컷.
 		String filePath = uploadDir + "/" + imageUrl; 
 		boolean deleteFile = new File(filePath).delete();
-	    
+	    return deleteFile;
 	    
 	}
 

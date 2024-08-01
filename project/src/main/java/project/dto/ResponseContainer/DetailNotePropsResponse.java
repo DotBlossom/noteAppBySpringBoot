@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class DetailNotePropsResponse {
-	private String title;
-	private String contents;
+	private String noteTitle;
+	private String noteContents;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private String AuthorName;

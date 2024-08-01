@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import project.dto.ErrorDto;
 import project.dto.InsertRefBlockRequest;
 import project.dto.NoteJoinUserDto;
 import project.dto.NoteListResponse;
@@ -196,7 +196,7 @@ public class RestApiProjectController {
 	// post : data passing to serverProps (dtos..map..)
 	// imguri is true? 
 	// wired -> go to graph.
-	@PostMapping("ref/insertRef")
+	@PostMapping("/ref/insertRef")
 	public ResponseEntity<Object> insertRefBlock(@RequestBody InsertRefBlockRequest req) throws Exception{
 		
 		Map<String, String> result = new HashMap<>();
@@ -216,13 +216,13 @@ public class RestApiProjectController {
 			
 			result.put("code", HttpStatus.OK.toString());
 			result.put("message" , "ok");
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
 			
 			
 		}
 	}
 	
-	@GetMapping("notes/{username}")
+	@GetMapping("/notes/users/{username}")
 	public List<NoteJoinUserDto> getNoteByUsername(@PathVariable("username") String username) {
 		return noteService.selectAllNoteInfoProjectionByUserId(username);
 		
@@ -231,18 +231,56 @@ public class RestApiProjectController {
 	// file은 insert와 동일.
 	// delete는 note 삭제하면 다날아감 ㅋㅋ 
 
-	@PutMapping("update/{noteIdx}")
-	public void updateNoteProps(@RequestPart(value="blocks", required=true) List<BlockEntity> blocks,
+	@PutMapping("/update/{noteIdx}")
+	public ResponseEntity<Object> updateNoteProps(@RequestPart(value="blocks", required=true) List<BlockEntity> blocks,
 			@RequestPart(value="noteProps", required=true) NotePropsUpdate noteProps,
 			@RequestPart(value="files", required=false) MultipartFile[] files,
 			@PathVariable("noteIdx") int noteIdx) throws Exception{
 		
+		Map<String, String> result = new HashMap<>();
+		
+		if(blocks == null) {
+			result.put("code", HttpStatus.NOT_FOUND.toString());
+			result.put("message" , "Fetch Failed");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+		}
+		
 		noteService.updateNote(blocks, noteProps, files, noteIdx);
+		
+		
+		result.put("code", HttpStatus.OK.toString());
+		result.put("message" , "ok");
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+
 	
 		
 	}
-	@DeleteMapping("image/{blockId}/{imageUrl}")
-	public void deleteBlockFile(@PathVariable("blockId") int blockId, @PathVariable("imageUrl") String imageUrl) throws IOException {
-		blockService.deleteFile(imageUrl);
+	@DeleteMapping("/image/{imageUrl}")
+	public ResponseEntity<Object> deleteBlockFile(@PathVariable("imageUrl") String imageUrl) throws IOException {
+		boolean res = blockService.deleteFile(imageUrl);
+		
+		Map<String, String> result = new HashMap<>();
+		if (res != true) {
+			result.put("code", HttpStatus.NOT_FOUND.toString());
+			result.put("message" , "File Not Found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+		}
+		
+		result.put("code", HttpStatus.OK.toString());
+		result.put("message" , "ok");
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+	
+	@GetMapping("/notes/create")
+	public ErrorDto createByusername() {
+		ErrorDto q = new ErrorDto();	
+
+		NoteEntity s = noteService.createNote();
+		noteService.createBlock(s);
+		
+		q.setNoteIdx(s.getNoteIdx());
+		
+		return q;
 	}
 }

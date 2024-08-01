@@ -8,6 +8,6 @@ import lombok.Data;
 public class NoteListResponse {
 	
 	private int noteIdx;
-	private String title;
+	private String noteTitle;
 	private LocalDateTime createdAt;
 }

@@ -11,8 +11,8 @@ import project.entity.NoteIndexEntity;
 @Data
 public class NoteDetailResponse {
 
-	private String title;
-	private String contents;
+	private String noteTitle;
+	private String noteContents;
 	
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;

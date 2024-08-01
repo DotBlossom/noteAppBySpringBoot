@@ -37,10 +37,43 @@ public class NoteServiceImpl implements NoteService {
 	
 	@Autowired
 	private NoteRepository noteRepository;
+	
+	
+	@Override
+	public NoteEntity createNote() {
+		NoteEntity n = new NoteEntity();
 
+		noteRepository.save(n);
+		
+		return n;
+		
+	}
+	
+	@Override
+	public void createBlock(NoteEntity n) {
+		BlockEntity b = new BlockEntity();
+		
+		b.setNote(n);
+		
+		noteId = n.getNoteIdx();
+		tempKey = String.valueOf(noteId);
+		String temp = "1";
+		String z = tempKey + temp;
+		generateUniquePK = Integer.parseInt(z);
+		b.setBlockId(generateUniquePK);
+	
+		b.setCountLine("1");
+		b.setTag("p");
+		b.setHtml("");
+		b.setParseContents("");
 
 	
-
+		n.getBlocks().add(b);
+		
+		noteRepository.save(n);
+	
+	}
+	
 	@Override
 	public List<NoteEntity> selectNoteList() {
 		return customNoteRepository.findAllByOrderByNoteIdxDesc();
@@ -64,17 +97,17 @@ public class NoteServiceImpl implements NoteService {
 	public void insertNote(List<BlockEntity> blocks, NoteEntity note, 
 			MultipartFile[] files, String authorName) 
 		throws Exception {
-		
+		log.debug(authorName);
 		noteId = note.getNoteIdx();
 		tempKey = String.valueOf(noteId);
 		
 		//valid User.
 		if (userRepository.existsByUsername(authorName)) {
-			
-			note.setAuthor(userRepository.findByUsername(authorName));			
-			
+			note.setAuthor(userRepository.findByUsername(authorName));
+		} else if (authorName == "Admin") {
+			note.setAuthor(null);
 		} else {
-			throw new Exception("Bad Request2");
+			throw new Exception("Bad Request21");
 		}
 		
 		// -------------------block-file-mapping-Init ----------------------
@@ -120,6 +153,7 @@ public class NoteServiceImpl implements NoteService {
 	            if (discriminator  == "h1" || discriminator  == "h2" || discriminator  == "h3") {
 	            	NoteIndexEntity noteIndexEntity = new NoteIndexEntity();
 	            	noteIndexEntity.setParseContents(sq);
+	            	noteIndexEntity.setNote(note);
 	            	
 	            	
 	            	
@@ -219,7 +253,7 @@ public class NoteServiceImpl implements NoteService {
 		    
 		    // -------------------blockIndexInit ----------------------
 		    
-		    List<NoteIndexEntity> noteIndexEntityList = new ArrayList<>();
+		    
 		    int cnt = 0;
 		    boolean prevSwitch = false;
 		    int rootController = 0; 
@@ -232,7 +266,7 @@ public class NoteServiceImpl implements NoteService {
 		    
 		    
 		    qs.getBlocks().clear();
-		    
+		    qs.getIndexes().clear();
 		    
 		    
 		    for (BlockEntity block : blocks) {
@@ -260,8 +294,10 @@ public class NoteServiceImpl implements NoteService {
 		            String discriminator = block.getTag();
 		            String sq = block.getParseContents();
 		            int blockId = block.getBlockId();
+		            
 		            if (discriminator  == "h1" || discriminator  == "h2" || discriminator  == "h3") {
 		            	NoteIndexEntity noteIndexEntity = new NoteIndexEntity();
+		            	noteIndexEntity.setNote(qs);
 		            	noteIndexEntity.setParseContents(sq);
 		            	
 		            	
@@ -283,10 +319,10 @@ public class NoteServiceImpl implements NoteService {
 		            	noteIndexEntity.setRootBlockRocation(rootController);
 		            	noteIndexEntity.setBlockIdOfIndex(blockId);
 		            	noteIndexEntity.setIndexBlockNoteIdx(noteIdx);
-		            	noteIndexEntityList.add(noteIndexEntity);
+		            	
 		            	
 		            	cnt ++;
-		            	
+		            	qs.getIndexes().add(noteIndexEntity);
 		            }
 		            
 		            // -------------------fileMapping setting ----------------------

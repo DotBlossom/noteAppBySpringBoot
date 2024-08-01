@@ -22,7 +22,7 @@ public interface BlockService {
 	Page<BlockPageDto> searchParseContents(String kw, Pageable pageable);
 	
 	void insertRefBlock(int WBlockId, int WNoteIdx, int hasRefCnt, BlockDetailProjection ref);
-	void deleteFile(String imageUrl) throws IOException;
+	boolean deleteFile(String imageUrl) throws IOException;
 	
 	
 }

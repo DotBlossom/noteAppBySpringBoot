@@ -17,6 +17,7 @@ public interface NoteService {
 	NoteEntity selectNoteByEntity(int noteIdx);
 	List<NoteJoinUserDto> selectAllNoteInfoProjectionByUserId(String username);
 	void updateNote(List<BlockEntity> blocks, NotePropsUpdate noteProps, MultipartFile[] files, int noteIdx) throws Exception;
-	
+	NoteEntity createNote();
+	void createBlock(NoteEntity n);
 }
 	

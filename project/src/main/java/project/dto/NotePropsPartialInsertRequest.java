@@ -10,9 +10,9 @@ import lombok.Data;
 public class NotePropsPartialInsertRequest {
 
 	//noteProps
-	private String title;
-	private String contents;
-	private int noteIdx;
+	private String noteTitle;
+	private String noteContents;
+	
 	private LocalDateTime createdAt;
 	private boolean isUpdated = false;
 	
