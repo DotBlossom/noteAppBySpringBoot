@@ -20,6 +20,8 @@ import project.entity.BlockFileEntity;
 public interface BlockRepository extends JpaRepository<BlockEntity, Integer>, BaseBlockRepository<BlockEntity, Integer> {
 	
 	
+	
+	
 	//file -> entityVar designated 
 	@Query("SELECT file FROM BlockFileEntity file WHERE file.idx = :idx AND file.block.blockId = :blockId")
 	Optional<BlockFileEntity> findBlockFile(@Param("idx") int idx, @Param("blockId") int blockId);

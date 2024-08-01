@@ -1,5 +1,6 @@
 package project.controller;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,10 +17,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +41,7 @@ import project.dto.ResponseContainer.DetailBlocksResponse;
 import project.dto.ResponseContainer.NoteDetailResponse;
 import project.dto.projection.BlockDetailProjection;
 import project.dto.projection.BlockPageDto;
+import project.dto.updater.NotePropsUpdate;
 import project.entity.BlockEntity;
 import project.entity.BlockFileEntity;
 import project.entity.NoteEntity;
@@ -217,12 +222,27 @@ public class RestApiProjectController {
 		}
 	}
 	
-	@GetMapping("test/{username}")
-	public List<NoteJoinUserDto> getNoteByUsername(@RequestParam("username") String username) {
-		return noteService.selectNoteInfoProjectionByUserId(username);
+	@GetMapping("notes/{username}")
+	public List<NoteJoinUserDto> getNoteByUsername(@PathVariable("username") String username) {
+		return noteService.selectAllNoteInfoProjectionByUserId(username);
 		
 	}
 	
+	// file은 insert와 동일.
+	// delete는 note 삭제하면 다날아감 ㅋㅋ 
+
+	@PutMapping("update/{noteIdx}")
+	public void updateNoteProps(@RequestPart(value="blocks", required=true) List<BlockEntity> blocks,
+			@RequestPart(value="noteProps", required=true) NotePropsUpdate noteProps,
+			@RequestPart(value="files", required=false) MultipartFile[] files,
+			@PathVariable("noteIdx") int noteIdx) throws Exception{
+		
+		noteService.updateNote(blocks, noteProps, files, noteIdx);
 	
-	
+		
+	}
+	@DeleteMapping("image/{blockId}/{imageUrl}")
+	public void deleteBlockFile(@PathVariable("blockId") int blockId, @PathVariable("imageUrl") String imageUrl) throws IOException {
+		blockService.deleteFile(imageUrl);
+	}
 }

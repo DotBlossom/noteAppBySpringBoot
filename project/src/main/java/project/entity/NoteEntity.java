@@ -84,13 +84,12 @@ public class NoteEntity {
 	*/
 	
 	
-	@OneToMany(mappedBy="note", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy="note", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<NoteIndexEntity> indexes = new ArrayList<>();
 	
 	
 	// EntityGraph oneQueryJoin
 	@OneToMany(mappedBy="note",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<BlockEntity> blocks = new ArrayList<>();
-	
-	
+
 }

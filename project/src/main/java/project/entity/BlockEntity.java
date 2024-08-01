@@ -63,10 +63,15 @@ public class BlockEntity {
 	@JoinColumn(name = "noteIdx")
 	private NoteEntity note;
 	
-	//block -> collect.blockfiles 접근 가능
-	@OneToMany(mappedBy="block" ,fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	//block -> collect.blockfiles 접근 가능 cascade.
+	@OneToMany(mappedBy="block" ,fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<BlockFileEntity> blockFiles;
 	
 	// ------------- blockRelatedByPageProps -------------------
+	public void deleteBlockFiles(BlockEntity block, BlockFileEntity blockFile) {
+		block.getBlockFiles().remove(blockFile);
+		blockFile.setBlock(null);
+	}
+
 	
 }	
