@@ -25,3 +25,6 @@
               DL 로직을 이용하여 내용을 찾게 해주는 검색 딥러닝 개발 하고 싶었음 . 
              
     자세한 내용은 생략.
+
+
+## front에서 reactCotentEditable을 사용해서, front에서 1차 dto만들어 여기로 보냄
